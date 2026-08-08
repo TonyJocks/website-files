@@ -309,7 +309,7 @@
           <div class="card py-3 mt-sm-3">
             <div class="card-body text-center">
               <h2 class="h3 fw-bold pb-3 text-primary">Thank you for your order!</h2>
-              <p class="fs-sm mb-2 text-dark">คำสั่งซื้อถูกสร้างเรียบร้อยแล้ว ชำระเงิน คำสั่งซื้อเลขที่ <span class="fw-bold text-danger" id="referenceMain"></a>
+              <p class="fs-sm mb-2 text-dark">คำสั่งซื้อถูกสร้างเรียบร้อยแล้ว ชำระเงิน คำสั่งซื้อเลขที่ <span class="fw-bold text-danger" id="referenceMain"></span>
 				<div class="p-2 my-4">
 					<!-- ==================================================
 						 PromptPay Placeholder
@@ -489,18 +489,26 @@
 <script src="app.js"></script>
 
 
+html
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
-    const params = new URLSearchParams(
-        window.location.search
-    );
+    /*
+     * Google Apps Script Web App
+     */
+    const API_URL =
+        "https://script.google.com/macros/s/AKfycbyODz1pSx3Dc6VcHgKWOkIhqFB_8Ly-3T9kigMz9jQbH1eNKFzqEE0DIhQZbjGP8AwE/exec";
 
-    const amountParam =
-        params.get("amount");
 
-    const referenceParam =
-        params.get("reference");
+    /* ==========================================================
+       Elements
+       ========================================================== */
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const orderParam =
+        params.get("order");
 
 
     const paymentSlip =
@@ -522,6 +530,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("qrcode");
 
 
+    /* ==========================================================
+       Error handler
+       ========================================================== */
+
     function showError(message) {
 
         paymentSlip.hidden = true;
@@ -534,10 +546,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ==========================================================
-       Validate URL parameters
+       Validate order code
        ========================================================== */
 
-    if (!amountParam || !referenceParam) {
+    if (!orderParam) {
 
         showError("Invalid payment link.");
 
@@ -545,104 +557,179 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const amount =
-        Number(amountParam);
-
-    const reference =
-        referenceParam.trim();
+    const order =
+        orderParam.trim();
 
 
-    if (
-        !Number.isFinite(amount) ||
-        amount <= 0
-    ) {
+    if (!order) {
 
-        showError("Invalid payment amount.");
-
-        return;
-    }
-
-
-    if (!reference) {
-
-        showError("Invalid payment reference.");
+        showError("Invalid payment order.");
 
         return;
     }
 
 
     /* ==========================================================
-       Display amount
+       Show order reference immediately
        ========================================================== */
 
-    amountElement.textContent =
-        new Intl.NumberFormat("th-TH", {
+    referenceElementMain.textContent =
+        order;
 
-            minimumFractionDigits: 2,
-
-            maximumFractionDigits: 2
-
-        }).format(amount) + " ฿";
-
-
-    /* ==========================================================
-       Display reference
-       ========================================================== */
 
     referenceElement.textContent =
-        reference;
+        order;
 
-	referenceElementMain.textContent =
-        reference;
+
     /* ==========================================================
-       Generate PromptPay QR
-       
-       IMPORTANT:
-       reference is passed unchanged to app.js.
-
-       Example:
-
-       IV2026080753366
-
-       app.js:
-           createTransactionCode(reference)
-
-       produces the transaction code used
-       by the PromptPay payload.
+       Get order information from Google Sheet
        ========================================================== */
 
     try {
 
-        const payload =
-            generatePromptPayPayload(
-                amount,
-                reference
+        const response =
+            await fetch(
+                API_URL +
+                "?order=" +
+                encodeURIComponent(order)
             );
 
 
-        new QRCode(qrElement, {
+        if (!response.ok) {
 
-            text: payload,
+            throw new Error(
+                "Unable to connect to payment service."
+            );
 
-            /*
-             * Generate a large QR first.
-             * CSS scales it down to fit the placeholder.
-             */
-            width: 600,
+        }
 
-            height: 600,
 
-            correctLevel:
-                QRCode.CorrectLevel.M
+        const data =
+            await response.json();
 
-        });
+
+        /* ======================================================
+           API response validation
+           ====================================================== */
+
+        if (!data.success) {
+
+            showError(
+                data.error ||
+                "Order not found."
+            );
+
+            return;
+        }
+
+
+        /* ======================================================
+           Check payment status
+           ====================================================== */
+
+        const status =
+            String(data.status || "")
+                .trim()
+                .toLowerCase();
+
+
+        /*
+         * Only Pending orders may display
+         * a payment QR.
+         */
+
+        if (status !== "pending") {
+
+            paymentSlip.hidden = true;
+
+            paymentError.hidden = false;
+
+            paymentError.textContent =
+                "This order has already been paid.";
+
+            return;
+        }
+
+
+        /* ======================================================
+           Validate amount
+           ====================================================== */
+
+        const amount =
+            Number(data.amount);
+
+
+        if (
+            !Number.isFinite(amount) ||
+            amount <= 0
+        ) {
+
+            showError(
+                "Invalid order amount."
+            );
+
+            return;
+        }
+
+
+        /* ======================================================
+           Display amount
+           ====================================================== */
+
+        amountElement.textContent =
+            new Intl.NumberFormat(
+                "th-TH",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            ).format(amount) + " ฿";
+
+
+        /* ======================================================
+           Generate PromptPay QR
+           
+           app.js remains completely unchanged.
+
+           The order code from Google Sheet is used
+           as the PromptPay reference.
+           ====================================================== */
+
+        const payload =
+            generatePromptPayPayload(
+                amount,
+                order
+            );
+
+
+        new QRCode(
+            qrElement,
+            {
+                text: payload,
+
+                /*
+                 * Generate large QR.
+                 * CSS scales it to fit the placeholder.
+                 */
+                width: 600,
+                height: 600,
+
+                correctLevel:
+                    QRCode.CorrectLevel.M
+            }
+        );
+
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Payment lookup error:",
+            error
+        );
+
 
         showError(
-            "Unable to generate the payment QR code."
+            "Unable to retrieve order information."
         );
 
     }
