@@ -23,38 +23,83 @@
     }
 
     .payment-card {
-        width: min(90%, 420px);
+        width: min(90%, 600px);
         padding: 30px 24px;
         background: #ffffff;
         border-radius: 16px;
-        text-align: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
         margin: 0 0 8px;
+        text-align: center;
         font-size: 28px;
     }
 
     h2 {
         margin: 0 0 24px;
+        text-align: center;
         font-size: 20px;
         font-weight: normal;
         color: #666666;
     }
 
-    .qr-code {
-        width: 280px;
-        max-width: 100%;
-        height: auto;
+    label {
         display: block;
-        margin: 0 auto 24px;
+        margin-top: 16px;
+        margin-bottom: 6px;
+        font-weight: bold;
     }
 
-    .instruction {
-        margin: 0;
-        color: #555555;
-        line-height: 1.5;
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 13px;
+        border: 0;
+        border-radius: 8px;
+        background: #222222;
+        color: #ffffff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.85;
+    }
+
+    .result {
+        margin-top: 24px;
+    }
+
+    .result-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    #payload {
+        width: 100%;
+        min-height: 180px;
+        padding: 12px;
+        border: 1px solid #dddddd;
+        border-radius: 8px;
+        background: #f8f8f8;
+        font-family: monospace;
+        font-size: 12px;
+        word-break: break-all;
+        white-space: pre-wrap;
+    }
+
+    .error {
+        margin-top: 15px;
+        color: #b00020;
     }
 </style>
 
@@ -67,19 +112,86 @@
 <main class="payment-card">
 
     <h1>TonyJocks</h1>
-    <h2>Payment</h2>
+    <h2>PromptPay QR Test</h2>
 
-    <img
-        class="qr-code"
-        src="assets/payment-qr.png"
-        alt="TonyJocks payment QR code"
+    <label for="amount">Amount</label>
+    <input
+        type="number"
+        id="amount"
+        value="500"
+        min="0.01"
+        step="0.01"
     >
 
-    <p class="instruction">
-        Scan the QR code to make payment.
-    </p>
+    <label for="reference">Reference</label>
+    <input
+        type="text"
+        id="reference"
+        value="TEST001"
+    >
+
+    <button id="generateButton">
+        Generate Payload
+    </button>
+
+    <div class="result">
+
+        <div class="result-title">
+            Generated PromptPay Payload
+        </div>
+
+        <div id="payload">
+            Click "Generate Payload"
+        </div>
+
+        <div id="error" class="error"></div>
+
+    </div>
 
 </main>
+
+<script src="app.js"></script>
+
+<script>
+    document
+        .getElementById('generateButton')
+        .addEventListener('click', function () {
+
+            const amount =
+                document.getElementById('amount').value;
+
+            const reference =
+                document.getElementById('reference').value;
+
+            const payloadElement =
+                document.getElementById('payload');
+
+            const errorElement =
+                document.getElementById('error');
+
+            payloadElement.textContent = '';
+            errorElement.textContent = '';
+
+            try {
+
+                const payload =
+                    generatePromptPayPayload(
+                        amount,
+                        reference
+                    );
+
+                payloadElement.textContent =
+                    payload;
+
+            } catch (error) {
+
+                errorElement.textContent =
+                    error.message;
+
+            }
+
+        });
+</script>
 
 
 </body>
