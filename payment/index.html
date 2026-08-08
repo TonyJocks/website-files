@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,48 +16,81 @@ html
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        /*
-         * PromptPay Payment Slip
-         *
-         * Original aspect ratio:
-         * 74 / 105
-         */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            background: #f5f5f5;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 920px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .payment-title {
+            margin: 0 0 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .payment-subtitle {
+            margin: 0 0 20px;
+            color: #666;
+            font-size: 15px;
+        }
+
+
+        /* ==================================================
+           PromptPay Placeholder
+           ================================================== */
 
         .promptpay-wrapper {
             width: 100%;
             max-width: 904px;
+
+            /*
+             * Original design ratio:
+             * 74 : 105
+             */
             aspect-ratio: 74 / 105;
+
             position: relative;
+
             border: 2px solid #094066;
             overflow: hidden;
-            margin: 0 auto;
-            background-color: #fff;
-        }
 
-        /* Fallback for browsers without aspect-ratio support */
-        @supports not (aspect-ratio: 1) {
-            .promptpay-wrapper {
-                height: calc(100vw / 74 * 105);
-                max-height: 1280px;
-            }
+            margin: 0 auto;
+
+            background-color: #fff;
         }
 
         .promptpay-content {
             position: absolute;
             inset: 0;
+
             width: 100%;
             height: 100%;
         }
 
-        /* --------------------------------------------------
-           Header
-        -------------------------------------------------- */
+
+        /* ==================================================
+           Thai QR Payment Header
+           ================================================== */
 
         .promptpay-header {
             background-color: #094066;
+
             padding: 0;
+
             text-align: center;
+
             height: 12%;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -66,21 +98,27 @@ html
 
         .promptpay-header img {
             display: block;
+
             max-width: 35%;
             max-height: 90%;
+
             width: auto;
             height: auto;
         }
 
-        /* --------------------------------------------------
+
+        /* ==================================================
            Payment Logos
-        -------------------------------------------------- */
+           ================================================== */
 
         .payment-logos {
             display: flex;
+
             justify-content: space-around;
             align-items: center;
+
             margin: 15px auto;
+
             width: 90%;
             height: 4.5%;
         }
@@ -88,35 +126,41 @@ html
         .payment-logos img {
             max-height: 100%;
             max-width: 22%;
+
             object-fit: contain;
+
             flex-basis: 22%;
         }
 
-        /* --------------------------------------------------
+
+        /* ==================================================
            QR Code
-        -------------------------------------------------- */
+           ================================================== */
 
         .qr-section {
             width: 85%;
+
             margin: 0 auto;
+
             background-color: #fff;
         }
 
         .qr-code-wrapper {
             position: relative;
+
             width: 100%;
-            height: auto;
             aspect-ratio: 1 / 1;
+
             overflow: hidden;
         }
 
         /*
-         * QRCode.js creates a canvas and/or image.
-         * Make either one scale with the payment slip.
+         * QRCode.js creates the actual QR here.
          */
         .qr-code {
             width: 100%;
             height: 100%;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -125,33 +169,45 @@ html
         .qr-code canvas,
         .qr-code img {
             display: block;
+
             width: 100% !important;
             height: 100% !important;
+
             max-width: 100%;
             max-height: 100%;
         }
 
-        /*
-         * Thai QR logo positioned over the QR.
-         *
-         * This is the same proportional positioning
-         * used in the original implementation.
-         */
+
+        /* ==================================================
+           Center Thai QR Logo
+           ================================================== */
+
         .qr-code-centered-logo {
             position: absolute;
+
             top: 50%;
             left: 50%;
+
             transform: translate(-38.8%, -49.8%);
+
             width: 12%;
             max-width: 100px;
+
             height: auto;
+
             pointer-events: none;
+
             z-index: 2;
         }
 
-        /* --------------------------------------------------
+
+        /* ==================================================
            Merchant Information
-        -------------------------------------------------- */
+           ================================================== */
+
+        .promptpay-wrapper {
+            font-size: calc(1vw + 0.5em);
+        }
 
         .merchant,
         .amount,
@@ -159,186 +215,246 @@ html
         .currency,
         .reference {
             line-height: 1.15;
+
             overflow: hidden;
         }
 
         .merchant {
             font-size: 0.8em;
+
             font-weight: bold;
+
             text-align: left;
         }
 
         .amount {
             font-size: 0.8em;
+
             font-weight: bold;
+
             text-align: right;
         }
 
         .merchant-account {
             font-size: 0.5em;
+
             font-weight: bold;
+
             text-align: left;
         }
 
         .currency {
             font-size: 0.5em;
+
             font-weight: bold;
+
             text-align: right;
         }
 
         .reference {
             color: #777;
+
             font-size: 0.5em;
+
             text-align: left;
         }
 
-        /* --------------------------------------------------
-           Overall Scaling
-        -------------------------------------------------- */
 
-        .promptpay-wrapper {
-            font-size: calc(1vw + 0.5em);
-        }
-
-        /* --------------------------------------------------
+        /* ==================================================
            Error
-        -------------------------------------------------- */
+           ================================================== */
 
         .payment-error {
             color: #c62828;
-            font-size: 16px;
-            text-align: center;
-            padding: 30px 15px;
+
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            padding: 30px 10px;
+        }
+
+
+        /* ==================================================
+           Mobile
+           ================================================== */
+
+        @media (max-width: 480px) {
+
+            body {
+                padding: 12px;
+            }
+
+            .payment-title {
+                font-size: 21px;
+            }
+
+            .payment-subtitle {
+                font-size: 14px;
+            }
+
         }
     </style>
 </head>
 
-<body class="bg-light">
 
-<div class="container-fluid py-3 py-md-4">
+<body>
 
-    <div id="payment-slip" class="promptpay-wrapper rounded-4">
+<div class="container-fluid">
 
-        <div class="promptpay-content">
+    <div class="payment-container">
 
-            <!-- ==========================================
-                 Top Navy Section
-            =========================================== -->
+        <h1 class="payment-title">
+            TonyJocks Payment
+        </h1>
 
-            <div class="promptpay-header">
-                <img
-                    src="assets/Thai_QR_Payment_Logo-01.jpg"
-                    alt="Thai QR Payment"
-                >
-            </div>
+        <p class="payment-subtitle">
+            Scan the QR code to make payment
+        </p>
 
 
-            <!-- ==========================================
-                 Payment Logos Section
-            =========================================== -->
+        <!-- ==================================================
+             PromptPay Placeholder
+             ================================================== -->
 
-            <div class="payment-logos">
+        <div
+            id="payment-slip"
+            class="promptpay-wrapper rounded rounded-4"
+        >
 
-                <img
-                    src="assets/PromptPay2.png"
-                    alt="PromptPay"
-                >
-
-                <img
-                    src="assets/visa_pos_fc.png"
-                    alt="Visa"
-                >
-
-                <img
-                    src="assets/mc_symbol_opt_73_3x.png"
-                    alt="Mastercard"
-                >
-
-                <img
-                    src="assets/UnionPay_Logo.png"
-                    alt="UnionPay"
-                >
-
-            </div>
+            <div class="promptpay-content">
 
 
-            <!-- ==========================================
-                 QR Code Section
-            =========================================== -->
+                <!-- ==================================================
+                     Top Navy Section
+                     ================================================== -->
 
-            <div class="qr-section">
+                <div class="promptpay-header">
 
-                <div class="qr-code-wrapper">
-
-                    <!-- Dynamic QR generated by app.js -->
-                    <div id="qrcode" class="qr-code"></div>
-
-                    <!-- Thai QR logo overlay -->
                     <img
-                        class="qr-code-centered-logo"
-                        src="assets/Thai_QR_Payment_Logo-03.png"
-                        alt="Thai QR Code"
+                        src="assets/Thai_QR_Payment_Logo-01.jpg"
+                        alt="Thai QR Payment"
                     >
 
                 </div>
 
 
-                <!-- ======================================
-                     Merchant / Amount
-                ======================================= -->
+                <!-- ==================================================
+                     Payment Logos Section
+                     ================================================== -->
 
-                <div class="row g-0">
+                <div class="payment-logos">
 
-                    <div
-                        id="merchant"
-                        class="col-6 merchant"
+                    <img
+                        src="assets/PromptPay2.png"
+                        alt="PromptPay"
                     >
-                        TONYJOCKS APPAREL
-                    </div>
 
-                    <div
-                        id="amount"
-                        class="col-6 amount"
+                    <img
+                        src="assets/visa_pos_fc.png"
+                        alt="Visa"
                     >
-                        -
-                    </div>
+
+                    <img
+                        src="assets/mc_symbol_opt_73_3x.png"
+                        alt="Mastercard"
+                    >
+
+                    <img
+                        src="assets/UnionPay_Logo.png"
+                        alt="UnionPay"
+                    >
 
                 </div>
 
 
-                <!-- ======================================
-                     Merchant Account / Currency
-                ======================================= -->
+                <!-- ==================================================
+                     QR Code Section
+                     ================================================== -->
 
-                <div class="row g-0">
+                <div class="qr-section">
 
-                    <div
-                        id="merchant-account"
-                        class="col-8 merchant-account"
-                    >
-                        4787720001114259
+                    <div class="qr-code-wrapper">
+
+                        <!--
+                            Dynamic QR generated by app.js
+                        -->
+                        <div
+                            id="qrcode"
+                            class="qr-code"
+                        ></div>
+
+
+                        <!--
+                            Thai QR logo overlay
+                        -->
+                        <img
+                            class="qr-code-centered-logo"
+                            src="assets/Thai_QR_Payment_Logo-03.png"
+                            alt="Thai QR Code"
+                        >
+
                     </div>
 
-                    <div
-                        class="col-4 currency"
-                    >
-                        บาท (BAHT)
+
+                    <!-- ==================================================
+                         Merchant / Amount
+                         ================================================== -->
+
+                    <div class="row g-0">
+
+                        <div
+                            id="merchant"
+                            class="col-6 merchant"
+                        >
+                            TONYJOCKS APPAREL
+                        </div>
+
+                        <div
+                            id="amount"
+                            class="col-6 amount"
+                        >
+                            -
+                        </div>
+
                     </div>
 
-                </div>
+
+                    <!-- ==================================================
+                         Merchant Account / Currency
+                         ================================================== -->
+
+                    <div class="row g-0">
+
+                        <div
+                            id="merchant-account"
+                            class="col-8 merchant-account"
+                        >
+                            4787720001114259
+                        </div>
+
+                        <div
+                            class="col-4 currency"
+                        >
+                            บาท (BAHT)
+                        </div>
+
+                    </div>
 
 
-                <!-- ======================================
-                     Reference
-                ======================================= -->
+                    <!-- ==================================================
+                         Reference
+                         ================================================== -->
 
-                <div class="row g-0">
+                    <div class="row g-0">
 
-                    <div
-                        id="reference"
-                        class="col-12 reference"
-                    >
-                        -
+                        <div
+                            id="reference"
+                            class="col-12 reference"
+                        >
+                            -
+                        </div>
+
                     </div>
 
                 </div>
@@ -347,36 +463,55 @@ html
 
         </div>
 
-    </div>
 
-    <div
-        id="payment-error"
-        class="payment-error"
-        hidden
-    ></div>
+        <div
+            id="payment-error"
+            class="payment-error"
+            hidden
+        ></div>
+
+    </div>
 
 </div>
 
 
-<!-- Existing PromptPay / QR generation logic -->
+<!-- ==========================================================
+     Existing PromptPay JavaScript
+     
+     DO NOT MODIFY app.js
+     ========================================================== -->
+
 <script src="app.js"></script>
 
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
-    const amountParam = params.get("amount");
-    const referenceParam = params.get("reference");
+    const amountParam =
+        params.get("amount");
 
-    const paymentSlip = document.getElementById("payment-slip");
-    const paymentError = document.getElementById("payment-error");
+    const referenceParam =
+        params.get("reference");
 
-    const amountElement = document.getElementById("amount");
-    const referenceElement = document.getElementById("reference");
 
-    const qrElement = document.getElementById("qrcode");
+    const paymentSlip =
+        document.getElementById("payment-slip");
+
+    const paymentError =
+        document.getElementById("payment-error");
+
+    const amountElement =
+        document.getElementById("amount");
+
+    const referenceElement =
+        document.getElementById("reference");
+
+    const qrElement =
+        document.getElementById("qrcode");
 
 
     function showError(message) {
@@ -384,14 +519,15 @@ document.addEventListener("DOMContentLoaded", function () {
         paymentSlip.hidden = true;
 
         paymentError.hidden = false;
+
         paymentError.textContent = message;
 
     }
 
 
-    /* -----------------------------------------------
+    /* ==========================================================
        Validate URL parameters
-    ------------------------------------------------ */
+       ========================================================== */
 
     if (!amountParam || !referenceParam) {
 
@@ -401,11 +537,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const amount = Number(amountParam);
-    const reference = referenceParam.trim();
+    const amount =
+        Number(amountParam);
+
+    const reference =
+        referenceParam.trim();
 
 
-    if (!Number.isFinite(amount) || amount <= 0) {
+    if (
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ) {
 
         showError("Invalid payment amount.");
 
@@ -421,49 +563,68 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* -----------------------------------------------
-       Display payment information
-    ------------------------------------------------ */
+    /* ==========================================================
+       Display amount
+       ========================================================== */
 
     amountElement.textContent =
         new Intl.NumberFormat("th-TH", {
+
             minimumFractionDigits: 2,
+
             maximumFractionDigits: 2
+
         }).format(amount) + " ฿";
 
 
-    referenceElement.textContent = reference;
+    /* ==========================================================
+       Display reference
+       ========================================================== */
+
+    referenceElement.textContent =
+        reference;
 
 
-    /* -----------------------------------------------
+    /* ==========================================================
        Generate PromptPay QR
        
        IMPORTANT:
-       The reference is passed unchanged.
-       
-       app.js handles:
-       
+       reference is passed unchanged to app.js.
+
+       Example:
+
        IV2026080753366
-              ↓
-       createTransactionCode()
-              ↓
-       KPS00IV2026080753366
-    ------------------------------------------------ */
+
+       app.js:
+           createTransactionCode(reference)
+
+       produces the transaction code used
+       by the PromptPay payload.
+       ========================================================== */
 
     try {
 
         const payload =
-            generatePromptPayPayload(amount, reference);
+            generatePromptPayPayload(
+                amount,
+                reference
+            );
 
 
         new QRCode(qrElement, {
 
             text: payload,
 
+            /*
+             * Generate a large QR first.
+             * CSS scales it down to fit the placeholder.
+             */
             width: 600,
+
             height: 600,
 
-            correctLevel: QRCode.CorrectLevel.M
+            correctLevel:
+                QRCode.CorrectLevel.M
 
         });
 
