@@ -1,2 +1,2 @@
-# web-sitemap
-This repository hosted website files
+# website-files
+This repository hosted website files and related. Currently for education environment.
