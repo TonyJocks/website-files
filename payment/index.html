@@ -5,15 +5,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TonyJocks Payment</title>
+
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f5f5f5;
+        font-family: Arial, sans-serif;
+    }
+
+    .payment-card {
+        width: min(90%, 420px);
+        padding: 30px 24px;
+        background: #ffffff;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+    }
+
+    h2 {
+        margin: 0 0 24px;
+        font-size: 20px;
+        font-weight: normal;
+        color: #666666;
+    }
+
+    .qr-code {
+        width: 280px;
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto 24px;
+    }
+
+    .instruction {
+        margin: 0;
+        color: #555555;
+        line-height: 1.5;
+    }
+</style>
+
+
 </head>
+
 <body>
 
-```
-<h1>TonyJocks</h1>
-<h2>Payment QR</h2>
 
-<p>This is my first GitHub web app.</p>
-```
+<main class="payment-card">
+
+    <h1>TonyJocks</h1>
+    <h2>Payment</h2>
+
+    <img
+        class="qr-code"
+        src="assets/payment-qr.png"
+        alt="TonyJocks payment QR code"
+    >
+
+    <p class="instruction">
+        Scan the QR code to make payment.
+    </p>
+
+</main>
+
 
 </body>
 </html>
