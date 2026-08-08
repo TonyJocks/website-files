@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,8 +75,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 280px;
             margin: 0 auto 20px;
+            min-height: 280px;
         }
 
         #qrcode img,
@@ -118,7 +119,6 @@
         }
     </style>
 
-    <!-- QRCode.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
@@ -173,27 +173,36 @@
         }
 
         const amount = Number(amountParam);
+        const reference = referenceParam.trim();
 
         if (!Number.isFinite(amount) || amount <= 0) {
             showError("Invalid payment amount.");
             return;
         }
 
-        const reference = referenceParam.trim();
-
         if (!reference) {
             showError("Invalid payment reference.");
             return;
         }
 
-        amountElement.textContent = new Intl.NumberFormat("th-TH", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(amount) + " ฿";
+        amountElement.textContent =
+            new Intl.NumberFormat("th-TH", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount) + " ฿";
 
         referenceElement.textContent = reference;
 
         try {
+            /*
+             * Keep the real TonyJocks reference unchanged.
+             *
+             * Example:
+             * IV2026080753366
+             *
+             * app.js handles the conversion internally through
+             * createTransactionCode(), exactly as the old PHP code did.
+             */
             const payload = generatePromptPayPayload(amount, reference);
 
             new QRCode(qrElement, {
