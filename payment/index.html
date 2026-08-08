@@ -75,24 +75,58 @@
         opacity: 0.85;
     }
 
-    .result {
-        margin-top: 24px;
+    .qr-wrapper {
+        margin: 30px auto 20px;
+        display: flex;
+        justify-content: center;
     }
 
-    .result-title {
+    #qrcode {
+        padding: 10px;
+        background: #ffffff;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .payment-summary {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 18px;
+    }
+
+    .payment-summary strong {
+        font-size: 24px;
+    }
+
+    .reference {
+        margin-top: 8px;
+        color: #666666;
+        font-size: 14px;
+    }
+
+    .payload-wrapper {
+        margin-top: 25px;
+    }
+
+    .payload-title {
         font-weight: bold;
         margin-bottom: 8px;
     }
 
     #payload {
         width: 100%;
-        min-height: 180px;
+        min-height: 120px;
         padding: 12px;
         border: 1px solid #dddddd;
         border-radius: 8px;
         background: #f8f8f8;
         font-family: monospace;
-        font-size: 12px;
+        font-size: 11px;
         word-break: break-all;
         white-space: pre-wrap;
     }
@@ -100,6 +134,7 @@
     .error {
         margin-top: 15px;
         color: #b00020;
+        text-align: center;
     }
 </style>
 
@@ -112,9 +147,10 @@
 <main class="payment-card">
 
     <h1>TonyJocks</h1>
-    <h2>PromptPay QR Test</h2>
+    <h2>PromptPay Payment</h2>
 
     <label for="amount">Amount</label>
+
     <input
         type="number"
         id="amount"
@@ -124,6 +160,7 @@
     >
 
     <label for="reference">Reference</label>
+
     <input
         type="text"
         id="reference"
@@ -131,28 +168,55 @@
     >
 
     <button id="generateButton">
-        Generate Payload
+        Generate QR
     </button>
 
-    <div class="result">
+    <div class="qr-wrapper">
+        <div id="qrcode"></div>
+    </div>
 
-        <div class="result-title">
-            Generated PromptPay Payload
+    <div class="payment-summary">
+
+        <strong id="displayAmount">
+            ฿500.00
+        </strong>
+
+        <div class="reference">
+            Reference:
+            <span id="displayReference">TEST001</span>
         </div>
-
-        <div id="payload">
-            Click "Generate Payload"
-        </div>
-
-        <div id="error" class="error"></div>
 
     </div>
 
+    <div class="payload-wrapper">
+
+        <div class="payload-title">
+            Generated Payload
+        </div>
+
+        <div id="payload">
+            Click "Generate QR"
+        </div>
+
+    </div>
+
+    <div id="error" class="error"></div>
+
 </main>
 
+
+<!-- QRCode.js -->
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+
+<!-- Our PromptPay generator -->
 <script src="app.js"></script>
 
+
 <script>
+
+    let qrcode = null;
+
+
     document
         .getElementById('generateButton')
         .addEventListener('click', function () {
@@ -161,7 +225,7 @@
                 document.getElementById('amount').value;
 
             const reference =
-                document.getElementById('reference').value;
+                document.getElementById('reference').value.trim();
 
             const payloadElement =
                 document.getElementById('payload');
@@ -169,8 +233,20 @@
             const errorElement =
                 document.getElementById('error');
 
+            const qrElement =
+                document.getElementById('qrcode');
+
+            const displayAmount =
+                document.getElementById('displayAmount');
+
+            const displayReference =
+                document.getElementById('displayReference');
+
+
             payloadElement.textContent = '';
             errorElement.textContent = '';
+            qrElement.innerHTML = '';
+
 
             try {
 
@@ -180,8 +256,42 @@
                         reference
                     );
 
+
+                /*
+                 * Display the generated payload
+                 */
+
                 payloadElement.textContent =
                     payload;
+
+
+                /*
+                 * Display payment information
+                 */
+
+                displayAmount.textContent =
+                    '฿' + Number(amount).toFixed(2);
+
+                displayReference.textContent =
+                    reference;
+
+
+                /*
+                 * Generate QR code
+                 */
+
+                qrcode = new QRCode(
+                    qrElement,
+                    {
+                        text: payload,
+                        width: 350,
+                        height: 350,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    }
+                );
+
 
             } catch (error) {
 
@@ -191,6 +301,8 @@
             }
 
         });
+
+
 </script>
 
 
