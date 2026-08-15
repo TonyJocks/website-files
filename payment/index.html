@@ -613,7 +613,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
-
+		/* ======================================================
+           Check order status
+           ====================================================== */
+		if (data.order_status === "cancelled") {
+		
+		    paymentSlip.hidden = true;
+		
+		    paymentError.hidden = false;
+		
+		    paymentError.textContent =
+		        "This order has been cancelled.";
+		
+		    return;
+		}
+		
         /* ======================================================
            Check payment status
            ====================================================== */
