@@ -11,7 +11,7 @@
 * Google Apps Script Web App 
 */
 const PAYMENT_API_URL =
-    "https://script.google.com/macros/s/AKfycbyODz1pSx3Dc6VcHgKWOkIhqFB_8Ly-3T9kigMz9jQbH1eNKFzqEE0DIhQZbjGP8AwE/exec";
+    "https://script.google.com/macros/s/AKfycbwh7qxWQQZWEfkTC_tdIcwOPrz3M4k5V9mj8kubX62ATgqiZoEgLTvUde23C9_gB9jS/exec";
 
 /* =========================================================
    STATIC MERCHANT CONFIGURATION
