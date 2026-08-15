@@ -629,7 +629,7 @@ document.addEventListener("DOMContentLoaded", async function () {
          * a payment QR.
          */
 
-        if (status !== "unpaid") {
+        if (status == "paid") {
 
             paymentSlip.hidden = true;
 
@@ -641,7 +641,30 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+		if (status == "partial paid") {
 
+            paymentSlip.hidden = true;
+
+            paymentError.hidden = false;
+
+            paymentError.textContent =
+                "This order is partial paid. The payment amount should be specified by us.";
+
+            return;
+        }
+
+        if (status !== "unpaid") {
+
+            paymentSlip.hidden = true;
+
+            paymentError.hidden = false;
+
+            paymentError.textContent =
+                "This order can not pay through this system.";
+
+            return;
+        }
+		
         /* ======================================================
            Validate amount
            ====================================================== */
